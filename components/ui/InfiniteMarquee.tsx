@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 interface InfiniteMarqueeProps {
@@ -25,28 +25,7 @@ export const InfiniteMarquee = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const scrollerRef = useRef<HTMLUListElement>(null);
 
-    useEffect(() => {
-        addAnimation();
-    }, []);
-
     const [start, setStart] = useState(false);
-
-    function addAnimation() {
-        if (containerRef.current && scrollerRef.current) {
-            const scrollerContent = Array.from(scrollerRef.current.children);
-
-            scrollerContent.forEach((item) => {
-                const duplicatedItem = item.cloneNode(true);
-                if (scrollerRef.current) {
-                    scrollerRef.current.appendChild(duplicatedItem);
-                }
-            });
-
-            getDirection();
-            getSpeed();
-            setStart(true);
-        }
-    }
 
     const getDirection = () => {
         if (containerRef.current) {
@@ -69,6 +48,28 @@ export const InfiniteMarquee = ({
             }
         }
     };
+
+    const addAnimation = useCallback(() => {
+        if (containerRef.current && scrollerRef.current) {
+            const scrollerContent = Array.from(scrollerRef.current.children);
+
+            scrollerContent.forEach((item) => {
+                const duplicatedItem = item.cloneNode(true);
+                if (scrollerRef.current) {
+                    scrollerRef.current.appendChild(duplicatedItem);
+                }
+            });
+
+            getDirection();
+            getSpeed();
+            setStart(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        addAnimation();
+    }, [addAnimation]);
 
     return (
         <div
@@ -100,7 +101,7 @@ export const InfiniteMarquee = ({
                                 className="user-select-none -z-1 pointer-events-none absolute -left-0.5 -top-0.5 h-[calc(100%_+_4px)] w-[calc(100%_+_4px)]"
                             ></div>
                             <span className=" relative z-20 text-sm leading-[1.6] text-gray-100 font-normal">
-                                "{item.quote}"
+                                &ldquo;{item.quote}&rdquo;
                             </span>
                             <div className="relative z-20 mt-6 flex flex-row items-center">
                                 <span className="flex flex-col gap-1">
